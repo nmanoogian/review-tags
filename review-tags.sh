@@ -39,8 +39,11 @@ case $command in
 		;;
 
 	d|diff)
-		last_tag=$(git tag -l | grep "review/$branch_name" | tail -1)
 		git range-diff origin/develop "review/$branch_name/$3" "review/$branch_name/$4"
+		;;
+
+	co|checkout)
+		git checkout "review/$branch_name/$3"
 		;;
 
 	*)
