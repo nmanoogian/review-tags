@@ -8,6 +8,7 @@ if [[ $# -lt 1 ]]; then
 fi
 
 BRANCH_FILE="$HOME/.rt"
+touch "$BRANCH_FILE"
 branch_name=''
 
 fetch_branch_name() {
