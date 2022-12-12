@@ -4,7 +4,7 @@ set -eo pipefail
 
 if [[ $# -lt 1 ]]; then
   echo "usage: review-tags.sh <command>"
-  exit
+  exit 1
 fi
 
 BRANCH_FILE="$HOME/.rt"
@@ -14,7 +14,7 @@ fetch_branch_name() {
   branch_name="$(cat "$BRANCH_FILE")"
   if ! git rev-parse "origin/$branch_name" > /dev/null 2>&1; then
     echo "origin/$branch_name does not exist"
-    exit
+    exit 1
   fi
 }
 
@@ -41,7 +41,7 @@ case $command in
     else
       if [ "$(git rev-parse "$last_tag")" = "$(git rev-parse "origin/$branch_name")" ]; then
         echo "$last_tag is same as origin"
-        exit
+        exit 1
       fi
       last_num="${last_tag##*/}"
       new_num=$((last_num + 1))
