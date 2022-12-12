@@ -34,7 +34,7 @@ case $command in
 
   c|create)
     fetch_branch_name
-    last_tag=$(git tag -l | grep "review/$branch_name" | tail -1)
+    last_tag=$(git tag -l | grep "review/$branch_name" | tail -1 || echo "")
 
     if [ -z "$last_tag" ]; then
       new_num="1"
@@ -54,7 +54,7 @@ case $command in
 
   l|list)
     fetch_branch_name
-    git tag -l | grep "review/$branch_name"
+    git tag -l | grep "review/$branch_name" || echo "(none)"
     ;;
 
   d|diff)
