@@ -62,9 +62,14 @@ case $command in
     git tag -l | grep "review/$branch_name" || echo "(none)"
     ;;
 
-  d|diff)
+  rd|range-diff)
     fetch_branch_name
     git range-diff origin/develop "review/$branch_name/$2" "review/$branch_name/$3"
+    ;;
+
+  d|diff)
+    fetch_branch_name
+    git diff "review/$branch_name/$2" "review/$branch_name/$3"
     ;;
 
   co|checkout)
