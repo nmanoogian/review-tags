@@ -19,6 +19,10 @@ fetch_branch_name() {
   fi
 }
 
+fetch_last_tag() {
+  git tag -l | grep "review/$branch_name" | tail -1 || echo ""
+}
+
 command="$1"
 case $command in
   s|stat|status)
@@ -35,7 +39,7 @@ case $command in
 
   c|create)
     fetch_branch_name
-    last_tag=$(git tag -l | grep "review/$branch_name" | tail -1 || echo "")
+    last_tag=$(fetch_last_tag)
 
     if [ -z "$last_tag" ]; then
       new_num="1"
@@ -65,7 +69,13 @@ case $command in
 
   co|checkout)
     fetch_branch_name
-    git checkout "review/$branch_name/$2"
+    if [ -z "$2" ]; then
+      checkout_branch=$(fetch_last_tag)
+    else
+      checkout_branch="review/$branch_name/$2"
+    fi
+    echo "-> $checkout_branch"
+    git checkout "$checkout_branch"
     ;;
 
   *)
