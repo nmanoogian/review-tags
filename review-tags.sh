@@ -23,6 +23,16 @@ fetch_last_tag() {
   git tag -l | grep "review/$branch_name" | tail -1 || echo ""
 }
 
+fetch_default_branch() {
+  for possible_default in develop master main; do
+    if git rev-parse "origin/$possible_default" > /dev/null 2>&1; then
+      echo "$possible_default"
+      return
+    fi
+  done
+  exit 1
+}
+
 command="$1"
 case $command in
   s|stat|status)
@@ -64,7 +74,7 @@ case $command in
 
   rd|range-diff)
     fetch_branch_name
-    git range-diff origin/develop "review/$branch_name/$2" "review/$branch_name/$3"
+    git range-diff "origin/$(fetch_default_branch)" "review/$branch_name/$2" "review/$branch_name/$3"
     ;;
 
   d|diff)
