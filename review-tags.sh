@@ -39,14 +39,6 @@ case $command in
     cat "$BRANCH_FILE"
     ;;
 
-  sb|set-branch)
-    if [ -z "$2" ]; then
-      git branch -r | sed 's!origin/!!' | tr -d ' ' | fzf > "$BRANCH_FILE"
-    else
-      echo "$2" > "$BRANCH_FILE"
-    fi
-    ;;
-
   c|create)
     fetch_branch_name
     last_tag=$(fetch_last_tag)
