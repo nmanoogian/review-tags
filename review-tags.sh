@@ -27,8 +27,9 @@ fetch_last_tag() {
 
 fetch_default_branch() {
   for possible_default in develop master main; do
-    if git rev-parse "origin/$possible_default" > /dev/null 2>&1; then
-      echo "$possible_default"
+    possible_default_upstream="$(git for-each-ref --format='%(upstream:short)' "refs/heads/$possible_default")"
+    if git rev-parse "$possible_default_upstream" > /dev/null 2>&1; then
+      echo "$possible_default_upstream"
       return
     fi
   done
