@@ -17,7 +17,7 @@ fetch_branch_name() {
   branch_name=$(read_tracking_branch)
   if ! git rev-parse "$branch_name" > /dev/null 2>&1; then
     echo "$branch_name does not exist"
-    exit 1
+    return 1
   fi
 }
 
@@ -33,7 +33,26 @@ fetch_default_branch() {
       return
     fi
   done
-  exit 1
+  return 1
+}
+
+create_review_tag() {
+  last_tag=$(fetch_last_tag)
+
+  if [ -z "$last_tag" ]; then
+    new_num="1"
+  else
+    if [ "$(git rev-parse "$last_tag")" = "$(git rev-parse "$branch_name")" ]; then
+      echo "$last_tag is same as upstream"
+      return
+    fi
+    last_num="${last_tag##*/}"
+    new_num=$((last_num + 1))
+  fi
+
+  new_branch="review/$branch_name/$new_num"
+  git tag "$new_branch" "$branch_name"
+  echo "+ $new_branch"
 }
 
 command="$1"
@@ -44,22 +63,7 @@ case $command in
 
   c|create)
     fetch_branch_name
-    last_tag=$(fetch_last_tag)
-
-    if [ -z "$last_tag" ]; then
-      new_num="1"
-    else
-      if [ "$(git rev-parse "$last_tag")" = "$(git rev-parse "$branch_name")" ]; then
-        echo "$last_tag is same as upstream"
-        exit 1
-      fi
-      last_num="${last_tag##*/}"
-      new_num=$((last_num + 1))
-    fi
-
-    new_branch="review/$branch_name/$new_num"
-    git tag "$new_branch" "$branch_name"
-    echo "+ $new_branch"
+    create_review_tag
     ;;
 
   l|list)
@@ -75,6 +79,17 @@ case $command in
   d|diff)
     fetch_branch_name
     git diff "review/$branch_name/$2" "review/$branch_name/$3"
+    ;;
+
+  p|pull)
+    git fetch
+    if [ -n "$2" ]; then
+      git checkout "$2"
+    fi
+    fetch_branch_name
+    create_review_tag
+    git reset --keep "$(read_tracking_branch)"
+    create_review_tag
     ;;
 
   g|goto)
