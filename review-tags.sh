@@ -89,7 +89,6 @@ case $command in
     fetch_branch_name
     create_review_tag
     git reset --keep "$(read_tracking_branch)"
-    create_review_tag
     ;;
 
   g|goto)
