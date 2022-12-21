@@ -77,7 +77,7 @@ case $command in
     git diff "review/$branch_name/$2" "review/$branch_name/$3"
     ;;
 
-  co|checkout)
+  g|goto)
     fetch_branch_name
     if [ -z "$2" ]; then
       checkout_branch=$(fetch_last_tag)
@@ -85,7 +85,7 @@ case $command in
       checkout_branch="review/$branch_name/$2"
     fi
     echo "-> $checkout_branch"
-    git checkout "$checkout_branch"
+    git reset --keep "$checkout_branch"
     ;;
 
   *)
