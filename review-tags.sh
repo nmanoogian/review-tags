@@ -13,6 +13,10 @@ read_tracking_branch() {
   git for-each-ref --format='%(upstream:short)' "$(git symbolic-ref -q HEAD)"
 }
 
+read_tracking_remote() {
+  git for-each-ref --format='%(upstream:remotename)' "$(git symbolic-ref -q HEAD)"
+}
+
 fetch_branch_name() {
   branch_name=$(read_tracking_branch)
   if ! git rev-parse "$branch_name" > /dev/null 2>&1; then
@@ -27,7 +31,7 @@ fetch_last_tag() {
 
 fetch_default_branch() {
   for possible_default in develop master main; do
-    possible_default_upstream="$(git for-each-ref --format='%(upstream:short)' "refs/heads/$possible_default")"
+    possible_default_upstream="$(read_tracking_remote)/$possible_default"
     if git rev-parse "$possible_default_upstream" > /dev/null 2>&1; then
       echo "$possible_default_upstream"
       return
