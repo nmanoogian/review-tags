@@ -59,6 +59,32 @@ create_review_tag() {
   echo "+ $new_branch"
 }
 
+list_review_tags() {
+  git tag -l | grep "review/$branch_name" || echo "(none)"
+}
+
+diff_params=()
+fetch_diff_params() {
+  tags="$(list_review_tags)"
+  if [ "$(echo "$tags" | wc -l)" -lt 2 ]; then
+    echo "This command requires at least 2 tags"
+    exit 1
+  fi
+
+  if [ "$#" -eq 3 ]; then
+    first_tag="review/$branch_name/$2"
+    second_tag="review/$branch_name/$3"
+  elif [ "$#" -eq 2 ]; then
+    first_tag="review/$branch_name/$2"
+    second_tag="$(echo "$tags" | tail -1)" 
+  else
+    first_tag="$(echo "$tags" | tail -2 | head -1)" 
+    second_tag="$(echo "$tags" | tail -1)" 
+  fi
+  diff_params=("$first_tag" "$second_tag")
+  echo "${diff_params[0]} -> ${diff_params[1]}"
+}
+
 command="$1"
 case $command in
   s|stat|status)
@@ -72,17 +98,19 @@ case $command in
 
   l|list)
     fetch_branch_name
-    git tag -l | grep "review/$branch_name" || echo "(none)"
+    list_review_tags
     ;;
 
   rd|range-diff)
     fetch_branch_name
-    git range-diff "$(fetch_default_branch)" "review/$branch_name/$2" "review/$branch_name/$3"
+    fetch_diff_params "$@"
+    git range-diff "$(fetch_default_branch)" "${diff_params[0]}" "${diff_params[1]}"
     ;;
 
   d|diff)
     fetch_branch_name
-    git diff "review/$branch_name/$2" "review/$branch_name/$3"
+    fetch_diff_params "$@"
+    git diff "${diff_params[0]}" "${diff_params[1]}"
     ;;
 
   p|pull)
