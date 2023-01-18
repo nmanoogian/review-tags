@@ -20,3 +20,17 @@ When the author force-pushes a change, you can run `rt pull` (no arguments impli
 You can view a plain diff of the change by doing `rt diff 1 2` or simply `rt diff` which implies the last and second-to-last tags.
 
 Often, a plain diff isn't valuable because the author might have rebased on the base branch. It's often more valuable to do `rt range-diff` to show a [range-diff](https://git-scm.com/docs/git-range-diff) between the commits. This is effectively a "diff-diff" which shows what the author has changed in their own commits.
+
+# Lazygit Custom Command Example
+
+This command allows you to optionally provide a branch name in a prompt response. If unset, `rt` will default to pulling the locally checked out branch.
+
+```
+- key: "v"
+  description: "rt pull branch"
+  command: "rt p {{index .PromptResponses 0}}"
+  context: "localBranches"
+  prompts:
+    - type: 'input'
+      title: 'Branch Name:'
+```
