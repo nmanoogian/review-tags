@@ -34,3 +34,22 @@ This command allows you to optionally provide a branch name in a prompt response
     - type: 'input'
       title: 'Branch Name:'
 ```
+
+This command presents a menu to choose the `rt` command:
+
+```
+- key: "v"
+  prompts:
+    - type: 'menu'
+      title: 'rt action'
+      options:
+        - name: 'pull'
+          value: 'pull'
+        - name: 'range-diff'
+          value: 'range-diff'
+        - name: 'diff'
+          value: 'diff'
+  command: "rt {{index .PromptResponses 0}}"
+  context: 'localBranches'
+  subprocess: true
+```
