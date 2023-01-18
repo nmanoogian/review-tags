@@ -90,6 +90,7 @@ print_help() {
   echo "    d|diff [[from_tag] to_tag] - Show changes between commits"
   echo "    p|pull [branch] - Safely resets your local branch to upstream and creates a tag"
   echo "    g|goto [tag] - Safely resets your local branch to the given tag"
+  echo "    prune - Delete all review tags which no longer have upstream branches"
   echo "    help - Prints this help documentation"
 }
 
@@ -145,6 +146,16 @@ case $command in
     fi
     echo "-> $checkout_branch"
     git reset --keep "$checkout_branch"
+    ;;
+
+  prune)
+    for tag in $(git tag -l); do
+      if [[ "$tag" =~ ^review/(.*)/[0-9]+$ ]]; then
+        if ! git rev-parse "${BASH_REMATCH[1]}" > /dev/null 2>&1; then
+          git tag -d "$tag"
+        fi
+      fi
+    done
     ;;
 
   help|--help)
