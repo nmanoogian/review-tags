@@ -23,28 +23,24 @@ Often, a plain diff isn't valuable because the author might have rebased on the 
 
 # Lazygit Custom Command Example
 
-This command allows you to optionally provide a branch name in a prompt response. If unset, `rt` will default to pulling the locally checked out branch.
+This command pulls the locally checked out branch and shows the output in a CUI popup.
 
 ```
 - key: "v"
-  description: "rt pull branch"
-  command: "rt p {{index .PromptResponses 0}}"
+  description: "rt pull"
+  command: "rt p"
   context: "localBranches"
-  prompts:
-    - type: 'input'
-      title: 'Branch Name:'
+  showOutput: true
 ```
 
-This command presents a menu to choose the `rt` command:
+This command presents a menu to choose the `rt` diff command:
 
 ```
-- key: "v"
+- key: "<c-v>"
   prompts:
     - type: 'menu'
       title: 'rt action'
       options:
-        - name: 'pull'
-          value: 'pull'
         - name: 'range-diff'
           value: 'range-diff'
         - name: 'diff'
