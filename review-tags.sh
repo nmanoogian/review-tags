@@ -55,7 +55,7 @@ create_review_tag() {
 }
 
 list_review_tags() {
-  git tag -l | grep "review/$branch_name" || echo "(none)"
+  git tag -l --sort creatordate | grep "review/$branch_name" || echo "(none)"
 }
 
 diff_params=()
