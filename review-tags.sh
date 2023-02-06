@@ -21,7 +21,7 @@ fetch_branch_name() {
 }
 
 fetch_last_tag() {
-  git tag -l | grep "review/$branch_name" | tail -1 || echo ""
+  git tag -l --sort creatordate | grep "review/$branch_name" | tail -1 || echo ""
 }
 
 fetch_default_branch() {
