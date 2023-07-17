@@ -156,6 +156,7 @@ case $command in
         fi
       fi
     done
+    echo "Done! You might want to run 'git prune' to remove newly-unreachable objects."
     ;;
 
   help|--help)
