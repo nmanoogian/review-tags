@@ -14,7 +14,7 @@ read_tracking_remote() {
 
 fetch_branch_name() {
   branch_name=$(read_tracking_branch)
-  if ! git rev-parse "$branch_name" > /dev/null 2>&1; then
+  if ! git rev-parse "$branch_name" >/dev/null 2>&1; then
     echo "\"$branch_name\" tracking branch does not exist"
     return 1
   fi
@@ -27,7 +27,7 @@ fetch_last_tag() {
 fetch_default_branch() {
   for possible_default in develop master main; do
     possible_default_upstream="$(read_tracking_remote)/$possible_default"
-    if git rev-parse "$possible_default_upstream" > /dev/null 2>&1; then
+    if git rev-parse "$possible_default_upstream" >/dev/null 2>&1; then
       echo "$possible_default_upstream"
       return
     fi
@@ -71,10 +71,10 @@ fetch_diff_params() {
     second_tag="review/$branch_name/$3"
   elif [ "$#" -eq 2 ]; then
     first_tag="review/$branch_name/$2"
-    second_tag="$(echo "$tags" | tail -1)" 
+    second_tag="$(echo "$tags" | tail -1)"
   else
-    first_tag="$(echo "$tags" | tail -2 | head -1)" 
-    second_tag="$(echo "$tags" | tail -1)" 
+    first_tag="$(echo "$tags" | tail -2 | head -1)"
+    second_tag="$(echo "$tags" | tail -1)"
   fi
   diff_params=("$first_tag" "$second_tag")
   echo "${diff_params[0]} -> ${diff_params[1]}"
@@ -101,71 +101,71 @@ fi
 
 command="$1"
 case $command in
-  s|stat|status)
-    read_tracking_branch
-    ;;
+s | stat | status)
+  read_tracking_branch
+  ;;
 
-  c|create)
-    fetch_branch_name
-    create_review_tag
-    ;;
+c | create)
+  fetch_branch_name
+  create_review_tag
+  ;;
 
-  l|list)
-    fetch_branch_name
-    list_review_tags
-    ;;
+l | list)
+  fetch_branch_name
+  list_review_tags
+  ;;
 
-  rd|range-diff)
-    fetch_branch_name
-    fetch_diff_params "$@"
-    git range-diff "$(fetch_default_branch)" "${diff_params[0]}" "${diff_params[1]}"
-    ;;
+rd | range-diff)
+  fetch_branch_name
+  fetch_diff_params "$@"
+  git range-diff "$(fetch_default_branch)" "${diff_params[0]}" "${diff_params[1]}"
+  ;;
 
-  d|diff)
-    fetch_branch_name
-    fetch_diff_params "$@"
-    git diff "${diff_params[0]}" "${diff_params[1]}"
-    ;;
+d | diff)
+  fetch_branch_name
+  fetch_diff_params "$@"
+  git diff "${diff_params[0]}" "${diff_params[1]}"
+  ;;
 
-  p|pull)
-    git fetch
-    if [ -n "$2" ]; then
-      git checkout "$2"
-    fi
-    fetch_branch_name
-    create_review_tag
-    git reset --keep "$(read_tracking_branch)"
-    ;;
+p | pull)
+  git fetch
+  if [ -n "$2" ]; then
+    git checkout "$2"
+  fi
+  fetch_branch_name
+  create_review_tag
+  git reset --keep "$(read_tracking_branch)"
+  ;;
 
-  g|goto)
-    fetch_branch_name
-    if [ -z "$2" ]; then
-      checkout_branch=$(fetch_last_tag)
-    else
-      checkout_branch="review/$branch_name/$2"
-    fi
-    echo "-> $checkout_branch"
-    git reset --keep "$checkout_branch"
-    ;;
+g | goto)
+  fetch_branch_name
+  if [ -z "$2" ]; then
+    checkout_branch=$(fetch_last_tag)
+  else
+    checkout_branch="review/$branch_name/$2"
+  fi
+  echo "-> $checkout_branch"
+  git reset --keep "$checkout_branch"
+  ;;
 
-  prune)
-    for tag in $(git tag -l); do
-      if [[ "$tag" =~ ^review/(.*)/[0-9]+$ ]]; then
-        if ! git rev-parse "${BASH_REMATCH[1]}" > /dev/null 2>&1; then
-          git tag -d "$tag"
-        fi
+prune)
+  for tag in $(git tag -l); do
+    if [[ "$tag" =~ ^review/(.*)/[0-9]+$ ]]; then
+      if ! git rev-parse "${BASH_REMATCH[1]}" >/dev/null 2>&1; then
+        git tag -d "$tag"
       fi
-    done
-    echo "Done! You might want to run 'git prune' to remove newly-unreachable objects."
-    ;;
+    fi
+  done
+  echo "Done! You might want to run 'git prune' to remove newly-unreachable objects."
+  ;;
 
-  help|--help)
-    print_help
-    ;;
+help | --help)
+  print_help
+  ;;
 
-  *)
-    echo "Unknown command $command"
-    print_help
-    exit 1
-    ;;
+*)
+  echo "Unknown command $command"
+  print_help
+  exit 1
+  ;;
 esac
