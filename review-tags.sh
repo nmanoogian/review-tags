@@ -2,7 +2,10 @@
 
 set -eo pipefail
 
+review_tags_dir="$HOME/.review-tags"
+
 branch_name=''
+notes_file=''
 
 read_tracking_branch() {
   git for-each-ref --format='%(upstream:short)' "$(git symbolic-ref -q HEAD)"
@@ -18,6 +21,12 @@ fetch_branch_name() {
     echo "\"$branch_name\" tracking branch does not exist"
     return 1
   fi
+}
+
+fetch_notes_file() {
+  fetch_branch_name
+  mkdir -p "$review_tags_dir"
+  echo "$review_tags_dir/${branch_name//\//_}.notes.md"
 }
 
 fetch_last_tag() {
@@ -80,6 +89,13 @@ fetch_diff_params() {
   echo "${diff_params[0]} -> ${diff_params[1]}"
 }
 
+open_notes() {
+  notes_file="$(fetch_notes_file)"
+  touch "$notes_file"
+
+  ${EDITOR:-vim} "$notes_file"
+}
+
 print_help() {
   echo "usage: review-tags.sh <command> [options]"
   echo "Available commands:"
@@ -90,6 +106,7 @@ print_help() {
   echo "    d|diff [[from_tag] to_tag] - Show changes between commits"
   echo "    p|pull [branch] - Safely resets your local branch to upstream and creates a tag"
   echo "    g|goto [tag] - Safely resets your local branch to the given tag"
+  echo "    n|notes - Open a notes file for the current branch in \$EDITOR"
   echo "    prune - Delete all review tags which no longer have upstream branches"
   echo "    help - Prints this help documentation"
 }
@@ -146,6 +163,10 @@ g | goto)
   fi
   echo "-> $checkout_branch"
   git reset --keep "$checkout_branch"
+  ;;
+
+n | notes)
+  open_notes
   ;;
 
 prune)
