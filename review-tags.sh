@@ -26,7 +26,8 @@ fetch_branch_name() {
 fetch_notes_file() {
   fetch_branch_name
   mkdir -p "$review_tags_dir"
-  echo "$review_tags_dir/${branch_name//\//_}.notes.md"
+  branch_path="$(git rev-parse --show-toplevel)/$branch_name"
+  echo "$review_tags_dir/${branch_path//\//_}.notes.md"
 }
 
 fetch_last_tag() {
