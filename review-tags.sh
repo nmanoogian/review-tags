@@ -26,7 +26,8 @@ fetch_branch_name() {
 fetch_notes_file() {
   fetch_branch_name
   mkdir -p "$review_tags_dir"
-  branch_path="$(git rev-parse --show-toplevel)/$branch_name"
+  git_root="$(git rev-parse --show-toplevel)"
+  branch_path="$(echo "$git_root" | shasum | head -c 8)_$(basename "$git_root")_$branch_name"
   echo "$review_tags_dir/${branch_path//\//_}.notes.md"
 }
 
