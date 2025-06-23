@@ -106,6 +106,7 @@ print_help() {
   echo "    l|list - Lists tags"
   echo "    rd|range-diff [[from_tag] to_tag] - Compare two commit ranges with the base set to the default branch (develop|main|master) on the remote"
   echo "    d|diff [[from_tag] to_tag] - Show changes between commits"
+  echo "    dm|diff-modified [[from_tag] to_tag] - Show changes between commits, only showing changes to files that were modified in either version from the default branch"
   echo "    p|pull [branch] - Safely resets your local branch to upstream and creates a tag"
   echo "    g|goto [tag] - Safely resets your local branch to the given tag"
   echo "    n|notes - Open a notes file for the current branch in \$EDITOR"
@@ -144,6 +145,19 @@ d | diff)
   fetch_branch_name
   fetch_diff_params "$@"
   git diff "${diff_params[0]}" "${diff_params[1]}"
+  ;;
+
+dm | diff-modified)
+  fetch_branch_name
+  fetch_diff_params "$@"
+  default_branch="$(fetch_default_branch)"
+  changed_files="$(
+    cat \
+      <(git diff --name-only "$default_branch...${diff_params[0]}") \
+      <(git diff --name-only "$default_branch...${diff_params[1]}") |
+      sort -u
+  )"
+  git diff "${diff_params[0]}" "${diff_params[1]}" -- $changed_files
   ;;
 
 p | pull)
